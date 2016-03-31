@@ -5,7 +5,7 @@ public class Tile : MonoBehaviour {
     public static Tile tile;
     public Tile[] neighbors;
     public enum ISLAND { LAND, WATER };
-    public enum BIOME {  COAST, FOREST, DESERT, SNOW};
+    public enum BIOME {  OCEAN, COAST, FOREST, DESERT, SNOW};
     public Material WaterMat, CoastMat, ForestMat, SnowMat, DesertMat;
 
     public ISLAND island;
@@ -42,5 +42,6 @@ public class Tile : MonoBehaviour {
         else if (b == BIOME.FOREST) gameObject.GetComponent<Renderer>().material = ForestMat;
         else if (b == BIOME.DESERT) gameObject.GetComponent<Renderer>().material = DesertMat;
         else if (b == BIOME.SNOW) gameObject.GetComponent<Renderer>().material = SnowMat;
+        else if (b == BIOME.OCEAN) gameObject.GetComponent<Renderer>().material = WaterMat;
     }
 }

@@ -5,16 +5,18 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class WorldManager : MonoBehaviour {
-    public static int gridSize;
+    public static WorldManager instance;
+
+    public int gridSize;
     public int waterBuf;
     public float waterThreshold;
     float gridCenter;
     Tile[,] grid;
-
+    
     public VillageMarker vmPrefab;
     public DungeonMarker dmPrefab;
-    public static int numVills = 5;
-    public static int dungeonPerVill = 2;
+    public int numVills = 5;
+    public int dungeonPerVill = 2;
 
     public static bool generated = false;
 
@@ -22,7 +24,7 @@ public class WorldManager : MonoBehaviour {
     static WorldData saveData;
 
     //assign variables, create grid references, create persistent data
-    void SetGridReferences()
+    void SetReferences()
     {
         gridCenter = gridSize / 2;
 
@@ -40,6 +42,8 @@ public class WorldManager : MonoBehaviour {
         }
 
         saveData = new WorldData();
+        vmParent = new GameObject("Village Markers");
+        dmParent = new GameObject("Dungeon Markers");
     }
     void CreateLandWaterTransforms()
     {
@@ -158,6 +162,7 @@ public class WorldManager : MonoBehaviour {
                 {
                     float distFromCenter = Mathf.Sqrt(Mathf.Pow((i - gridCenter), 2) + Mathf.Pow((j - gridCenter), 2));
                     float pWater = distFromCenter / Mathf.Sqrt(2 * Mathf.Pow(gridCenter, 2));
+
                     pWater += UnityEngine.Random.Range(0, .2f);
                     if (pWater > waterThreshold)
                     {
@@ -219,9 +224,6 @@ public class WorldManager : MonoBehaviour {
     }
     void SetVillages()
     {
-        //create parent object for village markers
-        vmParent = new GameObject();
-        vmParent.name = "VillageMarkers";
         //We would like villages to not be too close together
         //we define a minimum distance for cities to be the radius of the land continent
         //divided by the number of desired cities.
@@ -289,7 +291,7 @@ public class WorldManager : MonoBehaviour {
                 while (true)
                 {
                     neighborIndex = (int)UnityEngine.Random.Range(0, t.neighbors.Length - float.Epsilon);
-                    if (!takenTiles.Contains(neighborIndex))
+                    if (!takenTiles.Contains(neighborIndex) && t.neighbors[neighborIndex] != null)
                     {
                         takenTiles.Add(neighborIndex);
                         pos = t.neighbors[neighborIndex].transform.position;
@@ -311,7 +313,7 @@ public class WorldManager : MonoBehaviour {
             for(int j = 0; j < gridSize; j++)
             {
                 Tile t = grid[i, j];
-                saveData.landOrWater[i, j] = (int)t.island;
+                saveData.islands[i, j] = (int)t.island;
                 saveData.biomes[i, j] = (int)t.biome;
             }
         }
@@ -330,17 +332,18 @@ public class WorldManager : MonoBehaviour {
         saveData.lastPlayerLocation[1] = PlayerController.player.transform.position.y;
         saveData.lastPlayerLocation[2] = PlayerController.player.transform.position.z;
     }
+
     public static void SaveWorld()
     {
+        instance.CreatePersistentData();
 
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Open(Application.persistentDataPath + "/world_data.dat", FileMode.Create);
-
         bf.Serialize(file, saveData);
         file.Close();
     }
 
-    public static void LoadWorld()
+    public void LoadWorld()
     {
         if(File.Exists(Application.persistentDataPath + "/world_data.dat"))
         {
@@ -350,21 +353,49 @@ public class WorldManager : MonoBehaviour {
             saveData = (WorldData) bf.Deserialize(file);
             file.Close();
 
+            for(int i = 0; i < gridSize; i++)
+            {
+                for(int j = 0; j < gridSize; j++)
+                {
+                    grid[i, j].SetWaterOrLand((Tile.ISLAND)saveData.islands[i, j]);
+                    grid[i, j].SetBiome((Tile.BIOME) saveData.biomes[i,j]);
+                }
+            }
+            for(int i = 0; i < saveData.vmTiles.Length; i++)
+            {
+                VillageMarker vm = (VillageMarker)Instantiate(vmPrefab);
+                int[] tileCoords = saveData.vmTiles[i];
+                vm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
+                vm.transform.SetParent(vmParent.transform);
+            }
+            for(int i = 0; i < saveData.dmTiles.Length; i++)
+            {
+                DungeonMarker dm = (DungeonMarker)Instantiate(dmPrefab);
+                int[] tileCoords = saveData.dmTiles[i];
+                dm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
+                dm.transform.SetParent(dmParent.transform);
+            }
+
+            PlayerController.player.transform.position = new Vector3(saveData.lastPlayerLocation[0], saveData.lastPlayerLocation[1], saveData.lastPlayerLocation[2]);
+
         }
     }
     void Start()
     {
+        SetReferences();
+        SetNeighbors();
+        CreateLandWaterTransforms();
         if (GameManager.newWorld)
-        { 
-            SetGridReferences();
-            SetNeighbors();
-            CreateLandWaterTransforms();
+        {
+            
             CreateRoughCoasts();
-            for (int i = 0; i < 4; i++) PolishCoasts();
+            for (int i = 0; i < 4; i++)
+            {
+                PolishCoasts();
+            }
             FormBiomes();
             SetVillages();
             SetDungeons();
-            CreatePersistentData();
             GameManager.newWorld = false;
         }
         else
@@ -372,7 +403,18 @@ public class WorldManager : MonoBehaviour {
             LoadWorld();
         }
     }
-
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = (WorldManager)this.gameObject.GetComponent<WorldManager>();
+        }
+        else if (instance != this.gameObject.GetComponent<WorldManager>())
+        {
+            Destroy(instance.gameObject);
+        }
+        
+    }
 
 }
 
@@ -380,10 +422,10 @@ public class WorldManager : MonoBehaviour {
 class WorldData
 {
     //stores land/water info, biome info, location info for village and dungeon markers
-    public int[,] landOrWater = new int[WorldManager.gridSize, WorldManager.gridSize];
-    public int[,] biomes = new int[WorldManager.gridSize, WorldManager.gridSize];
-    public int[][] vmTiles = new int[WorldManager.numVills][];
-    public int[][] dmTiles = new int[WorldManager.numVills * WorldManager.dungeonPerVill][];
+    public int[,] islands = new int[WorldManager.instance.gridSize, WorldManager.instance.gridSize];
+    public int[,] biomes = new int[WorldManager.instance.gridSize, WorldManager.instance.gridSize];
+    public int[][] vmTiles = new int[WorldManager.instance.numVills][];
+    public int[][] dmTiles = new int[WorldManager.instance.numVills * WorldManager.instance.dungeonPerVill][];
 
     public float[] lastPlayerLocation = new float[3];
 }

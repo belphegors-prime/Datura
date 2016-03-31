@@ -22,7 +22,7 @@ public class VillageMarker : MonoBehaviour {
     {
         if(Vector3.Distance(transform.position, player.transform.position) < activationDist)
         {
-            //GameManager.PauseGame();
+            WorldManager.SaveWorld();
             SceneManager.LoadScene("Scenes/Village");
         }
     }
