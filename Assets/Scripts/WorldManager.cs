@@ -26,6 +26,10 @@ public class WorldManager : MonoBehaviour {
     //assign variables, create grid references, create persistent data
     void SetReferences()
     {
+        //since we are only using square grids, it is safe to assume that gridSize will be equal to
+        //the sqrt of the childCount of the world's transform
+
+        gridSize = (int) Mathf.Sqrt(transform.childCount);
         gridCenter = gridSize / 2;
 
         grid = new Tile[gridSize, gridSize];
@@ -361,6 +365,7 @@ public class WorldManager : MonoBehaviour {
                     grid[i, j].SetBiome((Tile.BIOME) saveData.biomes[i,j]);
                 }
             }
+            Debug.Log(gridSize);
             for(int i = 0; i < saveData.vmTiles.Length; i++)
             {
                 VillageMarker vm = (VillageMarker)Instantiate(vmPrefab);
@@ -387,9 +392,17 @@ public class WorldManager : MonoBehaviour {
         CreateLandWaterTransforms();
         if (GameManager.newWorld)
         {
-            
+            if (gameObject.name.Equals("LargeWorld"))
+                GameManager.SetWorldSize(GameManager.WorldSize.LARGE);
+            else if (gameObject.name.Equals("SmallWorld"))
+                GameManager.SetWorldSize(GameManager.WorldSize.SMALL);
+            else
+            {
+                Debug.Log("WorldManager is attached to an invalid gameobject");
+                return;
+            }
             CreateRoughCoasts();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 8; i++)
             {
                 PolishCoasts();
             }

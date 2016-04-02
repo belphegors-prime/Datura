@@ -2,11 +2,10 @@
 using System.Collections;
 
 public class Tile : MonoBehaviour {
-    public static Tile tile;
     public Tile[] neighbors;
     public enum ISLAND { LAND, WATER };
     public enum BIOME {  OCEAN, COAST, FOREST, DESERT, SNOW};
-    public Material WaterMat, CoastMat, ForestMat, SnowMat, DesertMat;
+    Material WaterMat, CoastMat, ForestMat, SnowMat, DesertMat;
 
     public ISLAND island;
     public BIOME biome;
@@ -14,9 +13,14 @@ public class Tile : MonoBehaviour {
 	// Use this for initialization
 	void Awake ()
     {
-        tile = this;
         neighbors = new Tile[8];
         coordinates = new int[2];
+
+        WaterMat = Resources.Load("Materials/Water") as Material;
+        CoastMat = Resources.Load("Materials/Coast") as Material;
+        ForestMat = Resources.Load("Materials/Forest") as Material;
+        SnowMat = Resources.Load("Materials/Snow") as Material;
+
 	}
 
     public bool isWater()

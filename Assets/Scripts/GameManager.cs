@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
     }
-    public void SetWorldSize(WorldSize ws)
+    public static void SetWorldSize(WorldSize ws)
     {
         worldsize = ws;
     }
