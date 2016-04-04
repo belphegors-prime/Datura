@@ -234,7 +234,7 @@ public class PlayerController : MonoBehaviour
 			// If player is within attack range, attack enemy
 			else if(Vector3.Distance(transform.position, lastTarget.transform.position) <= attackRange)
 			{
-                Debug.Log("Attack anims start");
+                //Debug.Log("Attack anims start");
 				transform.LookAt(targetGameObject.transform); // Face enemy when attacking
 				navAgent.ResetPath(); // Stop moving player
 				animator.SetInteger("CharacterState", (int) ANIMATION_STATE.ATTACK);

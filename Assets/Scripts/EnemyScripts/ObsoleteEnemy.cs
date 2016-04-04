@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class Enemy : Character 
+/*public abstract class ObsoleteEnemy : Character 
 {
 	// Enemy attributes
 	public PlayerController player;
@@ -12,51 +12,33 @@ public abstract class Enemy : Character
 	protected float morale;
 	protected float minimumFightingMorale;
 	protected bool willFlee;
-	protected bool bleedWhenDamaged;
-	public bool startSinking = false;
-	public float timer = 0.0f; // Begin timer at this value
-
-	public GameObject bloodPrefab;
-	private GameObject bloodPrefabInstance;
-    private float attackDelay;
-	Animator animator; // Animator controls the currently playing animation of enemy
+	
+	Animator animator;
 	
 	// Enemy state
-	public enum ENEMY_STATE {IDLE = 0, PATROL = 1, CHASE = 2, ATTACK = 3, BATTLE_STANCE = 4, DEAD = 5, FLEE = 6};
+	protected enum ENEMY_STATE {IDLE = 0, PATROL = 1, CHASE = 2, ATTACK = 3, BATTLE_STANCE = 4, DEAD = 5, FLEE = 6};
 	protected enum ANIMATION_STATE { IDLE = 0, MOVE = 1, ATTACK = 2, DEAD = 3, TAKE_DAMAGE = 4 }
-	public ENEMY_STATE activeState = ENEMY_STATE.PATROL;
+	protected ENEMY_STATE activeState = ENEMY_STATE.PATROL;
 
-	public float sinkSpeed = 2.5f; // Speed at which enemy sinks when dying
-    bool dead = false;
-	protected abstract void Initialize();
-
-	// Function is called when game scene loads
 	void Start()
 	{
 		animator = GetComponent<Animator>();
-        //attackDelay = animator.
 		Initialize();
 		player = PlayerController.player;
 		ChangeState(activeState);
 	}
 
-	// Function is called on every in-game frame
-	void Update()
-	{
-		if(startSinking) transform.Translate (-Vector3.up * sinkSpeed * Time.deltaTime);
-	}
-
-	// Function is called when user hovers over game object
 	void OnMouseEnter()
 	{
 		if(activeState != ENEMY_STATE.DEAD) 
 		{
-			player.target = this;
+			//player.target = this;
 			HealthBar.enableHealthBar();
 		}
 	}
 
-	// Function is called when user stops hovering on game object
+	protected abstract void Initialize();
+
 	void OnMouseExit() 
 	{
 		if(activeState != ENEMY_STATE.DEAD) 
@@ -66,19 +48,29 @@ public abstract class Enemy : Character
 		}
 	}
 
-	// Function is called when enemy takes damage
 	public void TakeDamage(float damage)
 	{
-		currentHealth-= damage; // Reduce enemy health
+		// Play impact damage sound
+		audioSource.PlayOneShot(impactSound, 0.7F);
 
-		if(currentHealth <= 0) ChangeState(ENEMY_STATE.DEAD); // Play dead animation
-		else if(Random.Range(0.0f, 1.0f) < 0.2f) animator.SetInteger("CharacterState", (int) ANIMATION_STATE.TAKE_DAMAGE); // Play get hit animation
+		// Reduce enemy health
+		currentHealth-= damage;
+		if(currentHealth <= 0) ChangeState(ENEMY_STATE.DEAD);
+		else animator.SetInteger("CharacterState", (int) ANIMATION_STATE.TAKE_DAMAGE); // Play dead animation
 
-		audioSource.PlayOneShot(impactSound, 0.7F); // Play get hit sound
-		if(bleedWhenDamaged) bloodPrefabInstance = Instantiate(bloodPrefab, transform.position, Quaternion.identity) as GameObject;
+
+		// Reduce morale, flee if morale below minimum
+//		else 
+//		{
+//			morale -= 50;
+//			if(willFlee && morale < minimumFightingMorale) 
+//			{
+//				//Debug.Log("Flee enable");
+//				ChangeState(ENEMY_STATE.FLEE);
+//			}
+//		}
 	}
 
-	// Function is called when enemy attacks
 	protected void CauseDamage()
 	{
 		// If player is within attack range, damager player
@@ -86,28 +78,22 @@ public abstract class Enemy : Character
 			player.TakeDamage(damage);
 	}
 
-	// Change state of the enemy in state machine
 	protected void ChangeState(ENEMY_STATE state)
 	{
 		StopAllCoroutines();
+		activeState = state;
 
-		if(activeState != ENEMY_STATE.DEAD)
+		switch(activeState)
 		{
-			activeState = state;
-
-			switch(activeState)
-			{
-				case ENEMY_STATE.IDLE: StartCoroutine(EnemyIdle()); return;
-				case ENEMY_STATE.PATROL: StartCoroutine(EnemyPatrol()); return;
-				case ENEMY_STATE.CHASE: StartCoroutine(EnemyChase()); return;
-				case ENEMY_STATE.ATTACK: StartCoroutine(EnemyAttack()); return;
-				case ENEMY_STATE.FLEE: StartCoroutine(EnemyFlee()); return;
-				case ENEMY_STATE.DEAD: StartCoroutine(EnemyDead()); return;
-			}
+			case ENEMY_STATE.IDLE: StartCoroutine(EnemyIdle()); return;
+			case ENEMY_STATE.PATROL: StartCoroutine(EnemyPatrol()); return;
+			case ENEMY_STATE.CHASE: StartCoroutine(EnemyChase()); return;
+			case ENEMY_STATE.ATTACK: StartCoroutine(EnemyAttack()); return;
+			case ENEMY_STATE.FLEE: StartCoroutine(EnemyFlee()); return;
+			case ENEMY_STATE.DEAD: StartCoroutine(EnemyDead()); return;
 		}
 	}
 
-	// Initiate enemy idle state
 	IEnumerator EnemyIdle()
 	{
 		navAgent.Stop(); // Stop moving enemy;
@@ -144,7 +130,6 @@ public abstract class Enemy : Character
 		}
 	}
 
-	// Initiate enemy patrol state
 	IEnumerator EnemyPatrol()
 	{
 		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.MOVE);
@@ -195,7 +180,6 @@ public abstract class Enemy : Character
 		ChangeState(ENEMY_STATE.IDLE);
 	}
 
-	// Initiate enemy chase state
 	IEnumerator EnemyChase()
 	{
 		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.MOVE);
@@ -229,20 +213,23 @@ public abstract class Enemy : Character
 		}
 	}
 
-	// Initiate enemy attack state
 	IEnumerator EnemyAttack()
 	{
-		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.ATTACK);
 		navAgent.Stop();
-		//float elapsedTime = attackDelay;
+		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.ATTACK);
+
+		float elapsedTime = attackSpeed;
 
 		while(activeState == ENEMY_STATE.ATTACK)
 		{
-			//elapsedTime += Time.deltaTime;
+			elapsedTime += Time.deltaTime;
+
 			transform.LookAt(player.transform); // Face player when attacking
 
 			// Calculate distance to player
 			float playerDistance = Vector3.Distance(transform.position, player.transform.position);
+
+			if(morale < minimumFightingMorale)
 
 			// If player is not within chase range, patrol
 			if(playerDistance > chaseRange)
@@ -258,11 +245,12 @@ public abstract class Enemy : Character
 				yield break;
 			}
 
+			if(elapsedTime >= attackSpeed) elapsedTime = 0.0f;
+
 			yield return null;
 		}
 	}
 
-	// Initiate enemy flee state
 	IEnumerator EnemyFlee()
 	{
 		//temporarily point the object to look away from the player
@@ -274,6 +262,8 @@ public abstract class Enemy : Character
 
 		NavMeshHit hit; // stores the output in a variable called hit
 		NavMesh.SamplePosition(runTo, out hit, 100.0f, 1);
+
+		//Debug.Log(hit.position);
 
 		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.MOVE);
 		navAgent.Resume();
@@ -296,36 +286,34 @@ public abstract class Enemy : Character
 			yield return null;
 		}
 	}
-		
-	// Modify the currently playing animation of the enemy
+
+	void IncreaseMorale()
+	{
+		//Debug.Log("increase morale triggers");
+		morale++;
+	}
+
 	void setAnimationState(ANIMATION_STATE animationState)
 	{
 		animator.SetInteger("CharacterState", (int) animationState);
 	}
-
-	// Initiate enemy dead state
+	
 	IEnumerator EnemyDead()
 	{
-        if (!dead)
-        {
-            dead = true;
-            animator.SetInteger("CharacterState", (int)ANIMATION_STATE.DEAD); // Play dead animation 
-        }
+		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.DEAD); // Play dead animation
 		Destroy(navAgent); // Make game object immovable
 		Destroy(GetComponent<Collider>()); // Make game object non selectable
 		if(player.target == this) player.target = null; // Unset this game object as target
 
-		float sinkingTime = 5.0f;
-        //float timerMax = 10.0f; // Destroy game oxbject once timer hits this value
+		float timer = 0.0f; // Begin timer at this value
+		float timerMax = 10.0f; // Destroy game oxbject once timer hits this value
+
 		// Delete game object once timer hits maximums
-		while(timer < 6.0f)
+		while(activeState == ENEMY_STATE.DEAD) 
 		{
 			timer += Time.deltaTime;
-			if(timer >= sinkingTime) startSinking = true;
+			if(timer >= timerMax) Destroy(gameObject);
 			yield return null;
 		}
-
-		Destroy(gameObject);
-		yield return null;
 	}
-}
+}*/
