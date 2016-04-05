@@ -27,7 +27,8 @@ public abstract class Enemy : Character
 	public ENEMY_STATE activeState = ENEMY_STATE.PATROL;
 
 	public float sinkSpeed = 2.5f; // Speed at which enemy sinks when dying
-    bool dead = false;
+    public bool dead = false;
+
 	protected abstract void Initialize();
 
 	// Function is called when game scene loads
@@ -311,6 +312,9 @@ public abstract class Enemy : Character
             dead = true;
             animator.SetInteger("CharacterState", (int)ANIMATION_STATE.DEAD); // Play dead animation 
         }
+
+        //transform.parent = null; //set parent (Squadron reference) to null, 
+
 		Destroy(navAgent); // Make game object immovable
 		Destroy(GetComponent<Collider>()); // Make game object non selectable
 		if(player.target == this) player.target = null; // Unset this game object as target

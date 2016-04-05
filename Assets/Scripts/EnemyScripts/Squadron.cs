@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public abstract class Squadron : MonoBehaviour {
-   
-    protected string path;
+    public int enemyCount;
+    public GameObject canvas;
+    public Font definitelyNotDiablosFont;
+    protected string path; //provided by subclasses
     Bounds spawnArea;
     
     void Awake()
@@ -20,20 +24,43 @@ public abstract class Squadron : MonoBehaviour {
 	}
     void CreateUnits()
     {
-        GameObject[] units = Resources.LoadAll<GameObject>(path);
-        for (int i = 0; i < units.Length; i++)
+        //randomly spawn enemies located in path
+        Enemy[] units = Resources.LoadAll<Enemy>(path);
+        for (int i = 0; i < enemyCount; i++)
         {
             Vector3 spawnPos = spawnArea.center;
             spawnPos.x = Random.Range(spawnArea.min.x, spawnArea.max.x);
             spawnPos.z = Random.Range(spawnArea.min.z, spawnArea.max.z);
-            GameObject enemy = (GameObject)Instantiate(units[i], spawnPos, Quaternion.identity);
+            int rand = (int) Random.Range(0, units.Length - float.Epsilon);
+            Enemy enemy = (Enemy) Instantiate(units[rand], spawnPos, Quaternion.identity);
             enemy.transform.SetParent(transform);
 
         }
     }
+    // Update is called once per frame
+    void Update()
+    {
+        //iterate over enemies, unparent if dead
+        /*foreach(Transform unit in transform)
+        {
+            if (unit.GetComponent<Enemy>().dead)
+            {
+                unit.parent = null; 
+            }
+        }*/
+        if(transform.GetComponentsInChildren<Enemy>().Length == 0)
+        {
+            Debug.Log("enemies cleared");
+            Text t = canvas.AddComponent<Text>();
+            t.text = "YOU DEFEATED";
+            t.font = definitelyNotDiablosFont;
+            t.fontSize = 32;
+            t.alignment = TextAnchor.MiddleCenter;
+            t.color = Color.red;
+
+            SceneManager.LoadScene(GameManager.GetWorldScenePath());
+        }
+    }
     protected abstract void Initialize();
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 }

@@ -4,7 +4,7 @@ using System.Collections;
 public class CameraFollow : MonoBehaviour
 {
 	public Transform target;
-    PlayerController player;
+    public PlayerController player;
 	public float height = 12;
 	public float radius = 10;
 	public float angle = 0;
@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour
 
 	void Awake()
 	{
-        player = PlayerController.player;
+        //player = PlayerController.player;
 		target = player.transform;
 	}
 

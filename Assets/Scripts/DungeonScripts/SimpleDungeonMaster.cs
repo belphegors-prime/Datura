@@ -6,7 +6,7 @@ public class SimpleDungeonMaster : MonoBehaviour
 {
     public Room roomPrefab;
     public Transform floorRef;
-    public PlayerController player;
+    
     public GameObject worldPortalPrefab;
     public int roomLimit;
 
@@ -16,6 +16,8 @@ public class SimpleDungeonMaster : MonoBehaviour
     Queue roomsToExpand;
     float[] floorBnds;
     int numRooms = 0;
+
+    PlayerController player;
 
     void Connect(Room s, Room t)
     {
@@ -312,6 +314,8 @@ public class SimpleDungeonMaster : MonoBehaviour
         dirToVector.Add('X', Vector3.right);
 
         roomsToExpand = new Queue();
+
+        player = PlayerController.player;
     }
     void Start()
     {
