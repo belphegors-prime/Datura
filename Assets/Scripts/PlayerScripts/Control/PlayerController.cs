@@ -38,11 +38,12 @@ public class PlayerController : MonoBehaviour
 
 	public void Awake()
 	{
-		player = this;
+		player = this.GetComponent<PlayerController>();
 	}
 
 	public void Start()
 	{
+        player = this.GetComponent<PlayerController>() ;
 		animator = GetComponent<Animator>(); // Get component that plays animations
 		navAgent = GetComponent<NavMeshAgent>(); // Get component that moves player
 		ChangeState(activeState); // Set default state

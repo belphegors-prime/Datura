@@ -19,10 +19,9 @@ public class RandomEncounter : MonoBehaviour {
             b = GetBiome();
             switch (b)
             {
-                /*case Tile.BIOME.COAST:
-                    WorldManager.SaveWorld();
+                case Tile.BIOME.COAST:
                     SceneManager.LoadScene("EncounterScenes/CoastEncounter");
-                    break;*/
+                    break;
 
                 case Tile.BIOME.SNOW:
                     
