@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour
 
 	void Awake()
 	{
-        //player = PlayerController.player;
+        player = PlayerController.player;
 		target = player.transform;
 	}
 

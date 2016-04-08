@@ -1,24 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 
 public class SimpleDungeonMaster : MonoBehaviour
 {
     public Room roomPrefab;
     public Transform floorRef;
-    
-    public GameObject worldPortalPrefab;
+    public GameObject wallPrefab, worldPortalPrefab, enemySpawner;
     public int roomLimit;
 
     float floorMaxX, floorMinX, floorMaxZ, floorMinZ, roomWidth, roomHeight;
     Hashtable posToRoom, dirToVector;
     Vector3 floorSize;
-    Queue roomsToExpand;
+    Queue<Room> roomsToExpand;
     float[] floorBnds;
     int numRooms = 0;
-
+    static ArrayList rooms;
     PlayerController player;
 
+
+    public static ArrayList GetRooms()
+    {
+        return (ArrayList) rooms.Clone();
+    }
     void Connect(Room s, Room t)
     {
         Debug.Log("connecting" + s.name + " " + t.name);
@@ -82,9 +86,33 @@ public class SimpleDungeonMaster : MonoBehaviour
             }
         }
     }
-    
+    void ActivateEnemySpawner()
+    {
+        enemySpawner.SetActive(true);
+    }
+    void CloseRemainingRooms()
+    {
+        Room[] r = (Room[])roomsToExpand.ToArray();
+        for (int i = 0; i < roomsToExpand.Count; i++)
+        {
+            foreach(Transform door in r[i].transform.Find("Doors"))
+            {
+                if (r[i].transform.Find("Walls").Find(door.name[0] + "Wall") == null)
+                {
+                    GameObject w = (GameObject)Instantiate(wallPrefab);
+                    w.transform.position = door.GetComponent<Renderer>().bounds.center;
+                    w.transform.rotation = Quaternion.Euler(new Vector3(0f, door.transform.rotation.y, 0f));
+                    w.transform.SetParent(r[i].transform);
+                }
+                Destroy(door.gameObject);
+            }
+        }
+    }
+
+    //takes a room and a direction
     void ConstructRoom(Room creator, char cardinal)
     {
+        if (numRooms > roomLimit) return;
         int currentDepth = creator.depth + 1;
         Vector3 entryPos = creator.transform.position;
         Room neighbor = Instantiate(roomPrefab) as Room;
@@ -127,8 +155,9 @@ public class SimpleDungeonMaster : MonoBehaviour
         }
         SetDoors(neighbor);
         roomsToExpand.Enqueue(neighbor);
+        rooms.Add(neighbor);
     }
-
+    
 
     //builds and connects rooms and hallways
     void Expand()
@@ -138,9 +167,10 @@ public class SimpleDungeonMaster : MonoBehaviour
             if (numRooms > roomLimit)
             {
                 Debug.Log(numRooms + " is greater than " + roomLimit);
+                CloseRemainingRooms();
                 return;
             }
-            Room r = roomsToExpand.Dequeue() as Room;
+            Room r = roomsToExpand.Peek() as Room;
             int currentDepth = r.depth + 1;
 
 
@@ -165,8 +195,8 @@ public class SimpleDungeonMaster : MonoBehaviour
                 {
                     ConstructRoom(r, door.name[0]);
                 }
-
-            } 
+            }
+            roomsToExpand.Dequeue();
         }
 
     }
@@ -202,10 +232,10 @@ public class SimpleDungeonMaster : MonoBehaviour
                     pDoor = 0;
                     break;
             }
-
+            
             //pDoor is large when there is more space to expand into
             //delete wall to allow access through door
-            if (pDoor > Random.value)
+            if (pDoor   > Random.value)
             {
                 Destroy(r.transform.FindChild("Walls").FindChild(wall.name).gameObject);
                 wall.parent = null;
@@ -285,6 +315,7 @@ public class SimpleDungeonMaster : MonoBehaviour
 
         SetDoors(entry);
         roomsToExpand.Enqueue(entry);
+        rooms.Add(entry);
     }
 
 
@@ -313,7 +344,8 @@ public class SimpleDungeonMaster : MonoBehaviour
         dirToVector.Add('x', Vector3.left);
         dirToVector.Add('X', Vector3.right);
 
-        roomsToExpand = new Queue();
+        roomsToExpand = new Queue<Room>();
+        rooms = new ArrayList();
 
         player = PlayerController.player;
     }
@@ -322,6 +354,7 @@ public class SimpleDungeonMaster : MonoBehaviour
         SetReferences();
         SetEntryRoom();
         Expand();
+        ActivateEnemySpawner();
     }
 
 }

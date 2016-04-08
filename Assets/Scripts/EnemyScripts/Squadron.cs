@@ -48,7 +48,11 @@ public abstract class Squadron : MonoBehaviour {
                 unit.parent = null; 
             }
         }*/
-        if(transform.GetComponentsInChildren<Enemy>().Length == 0)
+        CheckIfDead();
+    }
+    protected virtual void CheckIfDead()
+    {
+        if (transform.GetComponentsInChildren<Enemy>().Length == 0)
         {
             Debug.Log("enemies cleared");
             Text t = canvas.AddComponent<Text>();
