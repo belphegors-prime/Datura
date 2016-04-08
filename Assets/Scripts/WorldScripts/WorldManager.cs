@@ -370,6 +370,7 @@ public class WorldManager : MonoBehaviour {
             {
                 VillageMarker vm = (VillageMarker)Instantiate(vmPrefab);
                 int[] tileCoords = saveData.vmTiles[i];
+                vm.SetTile(grid[tileCoords[0], tileCoords[1]]);
                 vm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 vm.transform.SetParent(vmParent.transform);
             }
@@ -377,6 +378,7 @@ public class WorldManager : MonoBehaviour {
             {
                 DungeonMarker dm = (DungeonMarker)Instantiate(dmPrefab);
                 int[] tileCoords = saveData.dmTiles[i];
+                dm.SetTile(grid[tileCoords[0], tileCoords[1]]);
                 dm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 dm.transform.SetParent(dmParent.transform);
             }

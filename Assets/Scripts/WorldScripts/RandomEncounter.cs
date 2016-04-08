@@ -15,6 +15,7 @@ public class RandomEncounter : MonoBehaviour {
         Tile.BIOME b;
 	    if(Random.value < encounterProb)
         {
+            WorldManager.SaveWorld();
             b = GetBiome();
             switch (b)
             {
@@ -24,11 +25,13 @@ public class RandomEncounter : MonoBehaviour {
                     break;*/
 
                 case Tile.BIOME.SNOW:
-                    WorldManager.SaveWorld();
+                    
                     SceneManager.LoadScene("Scenes/EncounterScenes/SnowEncounter");
                     break;
 
-
+                case Tile.BIOME.FOREST:
+                    SceneManager.LoadScene("Scenes/EncounterScenes/ForestEncounter2");
+                    break;
 
             }
         }

@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 	// Player attributes
 	public float maxHealth;
 	public float currentHealth;
-	public float attackRange = 4.0f;
+	public float attackRange = 5.0f;
 	public float playerDamage = 35.0f;
     public float bufDistToTarget = .5f;
 
