@@ -97,24 +97,29 @@ public class SimpleDungeonMaster : MonoBehaviour
         {
             foreach(Transform door in r[i].transform.Find("Doors"))
             {
-                if (r[i].transform.Find("Walls").Find(door.name[0] + "Wall") == null)
+                Vector3 dir = (Vector3) dirToVector[door.name[0]];
+                if (r[i].transform.Find("Walls").Find(door.name[0] + "Wall") == null
+                    && !(posToRoom.ContainsKey(r[i].transform.position + dir)))
                 {
                     GameObject w = (GameObject)Instantiate(wallPrefab);
                     w.transform.position = door.GetComponent<Renderer>().bounds.center;
-                    w.transform.rotation = Quaternion.Euler(new Vector3(0f, door.transform.rotation.y, 0f));
+                    w.transform.rotation = new Quaternion(0, door.rotation.y, 0, door.rotation.w);
                     w.transform.SetParent(r[i].transform);
+                    //w.transform.localRotation = door.transform.localRotation;
                 }
                 Destroy(door.gameObject);
             }
         }
     }
 
-    //takes a room and a direction
+    //takes a room and a direction and creates a new room in that direction
     void ConstructRoom(Room creator, char cardinal)
     {
         if (numRooms > roomLimit) return;
         int currentDepth = creator.depth + 1;
         Vector3 entryPos = creator.transform.position;
+        
+        //build new room
         Room neighbor = Instantiate(roomPrefab) as Room;
         neighbor.transform.position = entryPos;
         neighbor.transform.SetParent(transform);
@@ -145,13 +150,19 @@ public class SimpleDungeonMaster : MonoBehaviour
                 w = "xWall";
                 break;
         }
-
+        d = w[0] + "Door";
+        //translate in direction of cardinal
         neighbor.transform.Translate(roomWidth * v);
         posToRoom.Add(neighbor.transform.position, neighbor);
         if (neighbor.transform.FindChild("Walls").FindChild(w).gameObject != null)
         {
+            //destroy wall between rooms
             Destroy(neighbor.transform.FindChild("Walls").FindChild(w).gameObject);
             neighbor.transform.FindChild("Walls").FindChild(w).parent = null;
+
+            //destroy redundant door between rooms
+            Destroy(neighbor.transform.FindChild("Doors").FindChild(d).gameObject);
+            neighbor.transform.FindChild("Doors").FindChild(d).parent = null;
         }
         SetDoors(neighbor);
         roomsToExpand.Enqueue(neighbor);

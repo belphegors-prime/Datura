@@ -6,15 +6,18 @@ public class GameManager : MonoBehaviour
 {
 
     public enum WorldSize { SMALL, LARGE};
+    public static bool newWorld = true;
+
     static WorldSize worldsize;
 
 	// Internal reference to single active instance of object - for singleton behaviour
 	private static GameManager instance = null;
-
+    private static int[] currentDungeon;
+    private static bool currentDungeonCompleted = false;
 	// Internal reference to notificationManager
 	private static NotificationManager notifications = null;
+    
 
-    public static bool newWorld = true;
 	public static GameManager Instance
 	{
 		get
@@ -88,4 +91,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public static int[] GetCurrentDungeon()
+    {
+        return currentDungeon;
+    }
+
+    public static void SetCurrentDungeon(int[] dungeonCoords)
+    {
+        currentDungeon = dungeonCoords;
+    }
+
+    public static bool IsCurrentDungeonCompleted()
+    {
+        return currentDungeonCompleted;
+    }
+
+    public static void SetCurrentDungeonCompleted(bool c)
+    {
+        currentDungeonCompleted = c;
+    }
 }

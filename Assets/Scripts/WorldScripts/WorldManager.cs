@@ -303,6 +303,7 @@ public class WorldManager : MonoBehaviour {
                     }
                 }
                 DungeonMarker dm = Instantiate(dmPrefab, pos, Quaternion.identity) as DungeonMarker;
+                dm.SetID(dmParent.transform.childCount);
                 dm.SetTile(t.neighbors[neighborIndex]);
                 dm.transform.SetParent(dmParent.transform);
                 dm.transform.rotation = dmPrefab.transform.rotation;
@@ -357,6 +358,7 @@ public class WorldManager : MonoBehaviour {
             saveData = (WorldData) bf.Deserialize(file);
             file.Close();
 
+            //set land/water and biome information
             for(int i = 0; i < gridSize; i++)
             {
                 for(int j = 0; j < gridSize; j++)
@@ -366,6 +368,8 @@ public class WorldManager : MonoBehaviour {
                 }
             }
             Debug.Log(gridSize);
+            
+            //reinstantiate village markers
             for(int i = 0; i < saveData.vmTiles.Length; i++)
             {
                 VillageMarker vm = (VillageMarker)Instantiate(vmPrefab);
@@ -374,10 +378,22 @@ public class WorldManager : MonoBehaviour {
                 vm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 vm.transform.SetParent(vmParent.transform);
             }
+            //reinstantiate dungeon markers
+            //get coordinates of last entered dungeon
+            int[] lastDungeonCoords = GameManager.GetCurrentDungeon();
             for(int i = 0; i < saveData.dmTiles.Length; i++)
             {
-                DungeonMarker dm = (DungeonMarker)Instantiate(dmPrefab);
+                
                 int[] tileCoords = saveData.dmTiles[i];
+                //if tileCoords match last dungeon coords and IsCurrentDungeon is set to true, then do not instantiate marker
+                if (tileCoords[0] == lastDungeonCoords[0]
+                    && tileCoords[1] == lastDungeonCoords[1]
+                    && GameManager.IsCurrentDungeonCompleted())
+                {
+                    GameManager.SetCurrentDungeonCompleted(false); //reset for next entered dungeon
+                    continue;
+                }
+                DungeonMarker dm = (DungeonMarker)Instantiate(dmPrefab);
                 dm.SetTile(grid[tileCoords[0], tileCoords[1]]);
                 dm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 dm.transform.SetParent(dmParent.transform);
@@ -441,6 +457,6 @@ class WorldData
     public int[,] biomes = new int[WorldManager.instance.gridSize, WorldManager.instance.gridSize];
     public int[][] vmTiles = new int[WorldManager.instance.numVills][];
     public int[][] dmTiles = new int[WorldManager.instance.numVills * WorldManager.instance.dungeonPerVill][];
-
+    public int[] dmID = new int[WorldManager.instance.numVills * WorldManager.instance.dungeonPerVill];
     public float[] lastPlayerLocation = new float[3];
 }
