@@ -27,7 +27,7 @@ public class WorldPortal : MonoBehaviour {
             //{
             //    scene = "Scenes/Worlds/Small/SmallWorld";
             //}
-            GameManager.SetCurrentDungeon(null);
+            //GameManager.SetCurrentDungeon(null);
             SceneManager.LoadScene(GameManager.GetWorldScenePath());
         }
     }

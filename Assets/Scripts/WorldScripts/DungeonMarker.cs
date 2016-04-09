@@ -49,6 +49,7 @@ public class DungeonMarker : MonoBehaviour {
         if (Vector3.Distance(transform.position, player.transform.position) <= activationDist)
         {
             //track dungeon marker by its coordinates
+            if(tileLocation.coordinates == null) Debug.Log("null tile location");
             GameManager.SetCurrentDungeon(tileLocation.coordinates);
             WorldManager.SaveWorld();
             SceneManager.LoadScene("Scenes/Dungeon");
