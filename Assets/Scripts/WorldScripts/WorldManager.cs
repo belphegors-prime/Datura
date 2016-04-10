@@ -10,6 +10,8 @@ public class WorldManager : MonoBehaviour {
     public int gridSize;
     public int waterBuf;
     public float waterThreshold;
+    public float coastSize;
+    public float forestDensity;
     float gridCenter;
     Tile[,] grid;
     
@@ -182,6 +184,10 @@ public class WorldManager : MonoBehaviour {
             }
         }
     }
+    void SetBiomeSeeds()
+    {
+
+    }
     public void PolishCoasts()
     {
         for (int i = waterBuf; i < gridSize - waterBuf; i++)
@@ -208,7 +214,29 @@ public class WorldManager : MonoBehaviour {
             }
         }
     }
-    public void FormBiomes()
+    
+    public void FormPerlinBiomes()
+    {
+        
+        for (int i = 0; i < landParent.transform.childCount; i++)
+        {
+            Tile t = landParent.transform.GetChild(i).gameObject.GetComponent<Tile>();
+            float distFromCenter = Mathf.Sqrt(Mathf.Pow((t.coordinates[0] - gridCenter), 2) + Mathf.Pow((t.coordinates[1] - gridCenter), 2)) / gridCenter;
+            if(distFromCenter > coastSize)
+            {
+                t.SetBiome(Tile.BIOME.COAST);
+                continue;
+            }
+            float x = t.coordinates[0] / UnityEngine.Random.value - .5f;
+            float y = t.coordinates[1]/ UnityEngine.Random.value - .5f;
+            float biomeVal = Mathf.PerlinNoise(x, y);
+           // Debug.Log(biomeVal);
+            if (biomeVal < forestDensity) t.SetBiome(Tile.BIOME.FOREST);
+            else t.SetBiome(Tile.BIOME.SNOW);
+               
+        }
+    }
+    /*public void FormBiomes()
     {
         for (int i = 0; i < landParent.transform.childCount; i++)
         {
@@ -225,7 +253,7 @@ public class WorldManager : MonoBehaviour {
 
             else if (biomeVal < .15) t.SetBiome(Tile.BIOME.SNOW);
         }
-    }
+    }*/
     void SetVillages()
     {
         //We would like villages to not be too close together
@@ -424,7 +452,8 @@ public class WorldManager : MonoBehaviour {
             {
                 PolishCoasts();
             }
-            FormBiomes();
+            SetBiomeSeeds();
+            FormPerlinBiomes();
             SetVillages();
             SetDungeons();
             GameManager.newWorld = false;
