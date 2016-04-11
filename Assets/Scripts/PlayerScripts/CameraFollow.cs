@@ -10,7 +10,7 @@ public class CameraFollow : MonoBehaviour
 	public float angle = 0;
 	public float rotationalSpeed = 5;
 
-	void Awake()
+	void Start()
 	{
         player = PlayerController.player;
 		target = player.transform;
@@ -19,7 +19,7 @@ public class CameraFollow : MonoBehaviour
 	// Update is called once per frame
 	void Update() 
 	{
-		if(!target) target = player.transform;
+		if(target == null) target = player.transform;
 		// Set default camera position coordinates
 		float cameraX = target.position.x + radius * Mathf.Cos(angle);
 		float cameraY = target.position.y + height;

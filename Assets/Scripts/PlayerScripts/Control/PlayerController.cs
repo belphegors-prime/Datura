@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
 	public Enemy lastTarget; // Reference to last selected enemy
     public GameObject ground;
     public Canvas inventoryPrefab;
+    public enum Gender { MALE, FEMALE}
+    static Gender gender;
 
     GameObject rightHandWeap, leftHandWeap, leftHandShieldMount;
     
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour
 
 	public void Awake()
 	{
-		player = this.GetComponent<PlayerController>();
+		player = this;
 	}
 
 	public void Start()
@@ -49,6 +51,7 @@ public class PlayerController : MonoBehaviour
 		ChangeState(activeState); // Set default state
 		maxHealth = 100.0f;
 		currentHealth = maxHealth;
+        DontDestroyOnLoad(this.gameObject);
 
         //rightHandWeap = GameObject.FindWithTag("Test");
 	}
@@ -57,7 +60,14 @@ public class PlayerController : MonoBehaviour
 	{
 		HandleButtonClick(); // If user clicks left mouse button, handle click
 	}
-
+    public static void SetGender(Gender g)
+    {
+        gender = g;
+    }
+    public static Gender GetGender()
+    {
+        return gender;
+    }
 	public float getCurrentHealth()
 	{
 		return currentHealth;
@@ -191,6 +201,7 @@ public class PlayerController : MonoBehaviour
 	{
         while (activeState == PLAYER_STATE.MOVE)
         {
+            Debug.Log(navAgent.enabled);
             navAgent.SetDestination(raycastHit.point); // Move player to destination
             animator.SetInteger("CharacterState", (int)ANIMATION_STATE.MOVE);
 

@@ -14,18 +14,42 @@ public class WorldManager : MonoBehaviour {
     public float forestDensity;
     float gridCenter;
     Tile[,] grid;
-    
+
     public VillageMarker vmPrefab;
     public DungeonMarker dmPrefab;
-    public int numVills = 5;
-    public int dungeonPerVill = 2;
+    static int numVills =3;
+    static int dungeonPerVill = 2;
 
     public static bool generated = false;
 
     GameObject landParent, waterParent, vmParent, dmParent;
+    PlayerController player;
     static WorldData saveData;
 
+
     //assign variables, create grid references, create persistent data
+    public int GetNumVillages()
+    {
+        return numVills;
+    }
+
+    public static void SetNumVillages(int n)
+    {
+        if (n > 0) numVills = n;
+        else throw new InvalidOperationException();
+    }
+
+    public int GetNumDungeons()
+    {
+        return numVills * dungeonPerVill;
+    }
+
+    public static void SetDungeonPerVill(int n)
+    {
+        if (n > 0) dungeonPerVill = n;
+        else throw new InvalidOperationException();
+    }
+
     void SetReferences()
     {
         //since we are only using square grids, it is safe to assume that gridSize will be equal to
@@ -184,10 +208,7 @@ public class WorldManager : MonoBehaviour {
             }
         }
     }
-    void SetBiomeSeeds()
-    {
 
-    }
     public void PolishCoasts()
     {
         for (int i = waterBuf; i < gridSize - waterBuf; i++)
@@ -236,24 +257,6 @@ public class WorldManager : MonoBehaviour {
                
         }
     }
-    /*public void FormBiomes()
-    {
-        for (int i = 0; i < landParent.transform.childCount; i++)
-        {
-            Tile t = landParent.transform.GetChild(i).gameObject.GetComponent<Tile>();
-            float distFromCenter = Mathf.Sqrt(Mathf.Pow((t.coordinates[0] - gridCenter), 2) + Mathf.Pow((t.coordinates[1] - gridCenter), 2));
-            float biomeVal = distFromCenter / Mathf.Sqrt(2 * Mathf.Pow(gridCenter, 2));
-
-            if (biomeVal <= .75 && biomeVal >= .5) t.SetBiome(Tile.BIOME.COAST);
-
-            else if (biomeVal < .5 && biomeVal >= .15)
-            {
-                t.SetBiome(Tile.BIOME.FOREST);
-            }
-
-            else if (biomeVal < .15) t.SetBiome(Tile.BIOME.SNOW);
-        }
-    }*/
     void SetVillages()
     {
         //We would like villages to not be too close together
@@ -338,6 +341,30 @@ public class WorldManager : MonoBehaviour {
             }
         }
     }
+
+    void SetPlayer()
+    {
+        //get player prefab based on gender
+        GameObject playerPrefab;
+        if (PlayerController.GetGender().Equals(PlayerController.Gender.MALE))
+        {
+            playerPrefab = (GameObject) Resources.Load("Players/MalePlayer");
+        }
+        else
+        {
+            playerPrefab = (GameObject)Resources.Load("Players/FemalePlayer");
+        }
+
+        //instantiate and spawn onto random land tile
+        player = Instantiate(playerPrefab).GetComponent<PlayerController>();
+        player.transform.position = landParent.transform.GetChild((int)UnityEngine.Random.Range(0, landParent.transform.childCount - 1)).position;
+        //temporary bug fix, adjust female player's Y position so she is on top of the ground
+        if (PlayerController.GetGender().Equals(PlayerController.Gender.FEMALE))
+        {
+            //player.transform.Translate(new Vector3(0f, -player.transform.position.y, 0f));
+        }
+
+    }
     void CreatePersistentData()
     {
         //store tile info
@@ -395,7 +422,7 @@ public class WorldManager : MonoBehaviour {
                     grid[i, j].SetBiome((Tile.BIOME) saveData.biomes[i,j]);
                 }
             }
-            Debug.Log(gridSize);
+            //Debug.Log(gridSize);
             
             //reinstantiate village markers
             for(int i = 0; i < saveData.vmTiles.Length; i++)
@@ -426,9 +453,10 @@ public class WorldManager : MonoBehaviour {
                 dm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 dm.transform.SetParent(dmParent.transform);
             }
-
+            PlayerController.player.GetComponent<NavMeshAgent>().enabled = false;
             PlayerController.player.transform.position = new Vector3(saveData.lastPlayerLocation[0], saveData.lastPlayerLocation[1], saveData.lastPlayerLocation[2]);
-
+            PlayerController.player.ChangeState(PlayerController.PLAYER_STATE.IDLE);
+            PlayerController.player.GetComponent<NavMeshAgent>().enabled = true;
         }
     }
     void Start()
@@ -452,16 +480,17 @@ public class WorldManager : MonoBehaviour {
             {
                 PolishCoasts();
             }
-            SetBiomeSeeds();
             FormPerlinBiomes();
             SetVillages();
             SetDungeons();
+            SetPlayer();
             GameManager.newWorld = false;
         }
         else
         {
             LoadWorld();
         }
+        Camera.main.GetComponent<CameraFollow>().enabled = true;
     }
     void Awake()
     {
@@ -484,8 +513,8 @@ class WorldData
     //stores land/water info, biome info, location info for village and dungeon markers
     public int[,] islands = new int[WorldManager.instance.gridSize, WorldManager.instance.gridSize];
     public int[,] biomes = new int[WorldManager.instance.gridSize, WorldManager.instance.gridSize];
-    public int[][] vmTiles = new int[WorldManager.instance.numVills][];
-    public int[][] dmTiles = new int[WorldManager.instance.numVills * WorldManager.instance.dungeonPerVill][];
-    public int[] dmID = new int[WorldManager.instance.numVills * WorldManager.instance.dungeonPerVill];
+    public int[][] vmTiles = new int[WorldManager.instance.GetNumVillages()][];
+    public int[][] dmTiles = new int[WorldManager.instance.GetNumDungeons()][];
+    //public int[] dmID = new int[WorldManager.instance.GetNumDungeons()];
     public float[] lastPlayerLocation = new float[3];
 }

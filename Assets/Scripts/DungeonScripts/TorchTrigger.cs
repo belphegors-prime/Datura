@@ -5,7 +5,7 @@ public class TorchTrigger : MonoBehaviour {
 
     void OnTriggerEnter(Collider c)
     {
-        Debug.Log("collision detected");
+        //Debug.Log("collision detected");
         //if player passes through collider, activate torch lights
         if (c.tag.Equals("Player"))
         {
@@ -19,7 +19,7 @@ public class TorchTrigger : MonoBehaviour {
         }
         else
         {
-            Debug.Log("non-player entered");
+           // Debug.Log("non-player entered");
         }
     }
 }

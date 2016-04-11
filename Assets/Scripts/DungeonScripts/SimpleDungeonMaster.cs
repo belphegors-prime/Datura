@@ -25,7 +25,7 @@ public class SimpleDungeonMaster : MonoBehaviour
     }
     void Connect(Room s, Room t)
     {
-        Debug.Log("connecting" + s.name + " " + t.name);
+        //Debug.Log("connecting" + s.name + " " + t.name);
         Vector3 dist = (s.transform.position - t.transform.position);
         Vector3 sPos = s.transform.position; Vector3 tPos = t.transform.position;
         /* ===================2 ROOMS CASE================*/
@@ -93,9 +93,11 @@ public class SimpleDungeonMaster : MonoBehaviour
     void CloseRemainingRooms()
     {
         Room[] r = (Room[])roomsToExpand.ToArray();
+        
         for (int i = 0; i < roomsToExpand.Count; i++)
         {
-            foreach(Transform door in r[i].transform.Find("Doors"))
+            Debug.Log(r[i].name);
+            foreach (Transform door in r[i].transform.Find("Doors"))
             {
                 Vector3 dir = (Vector3) dirToVector[door.name[0]];
                 if (r[i].transform.Find("Walls").Find(door.name[0] + "Wall") == null
@@ -177,7 +179,7 @@ public class SimpleDungeonMaster : MonoBehaviour
         {
             if (numRooms > roomLimit)
             {
-                Debug.Log(numRooms + " is greater than " + roomLimit);
+                //Debug.Log(numRooms + " is greater than " + roomLimit);
                 CloseRemainingRooms();
                 return;
             }
@@ -221,7 +223,7 @@ public class SimpleDungeonMaster : MonoBehaviour
 
             float pDoor;
             Transform wall = r.transform.FindChild("Walls").GetChild(i);
-            Debug.Log(r.name + " " + wall.name);
+            //Debug.Log(r.name + " " + wall.name);
             //determine whether to expand on a wall based on distance to floor boundry
             switch (wall.name[0])
             {
@@ -230,14 +232,14 @@ public class SimpleDungeonMaster : MonoBehaviour
                     break;
                 case 'Z':
                     pDoor = Mathf.Abs(wall.position.z - floorMaxZ) / (floorSize.z);
-                    Debug.Log(r.name + "pDoorZ" + pDoor);
+                   // Debug.Log(r.name + "pDoorZ" + pDoor);
                     break;
                 case 'x':
                     pDoor = Mathf.Abs(wall.position.x - floorMinX) / (floorSize.x);
                     break;
                 case 'X':
                     pDoor = Mathf.Abs(wall.position.x - floorMaxX) / (floorSize.x);
-                    Debug.Log(r.name + " pDoorX" + pDoor);
+                   // Debug.Log(r.name + " pDoorX" + pDoor);
                     break;
                 default:
                     pDoor = 0;

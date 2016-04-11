@@ -6,7 +6,7 @@ public class VillageMarker : MonoBehaviour {
     PlayerController player;
     float activationDist = 3f;
     Tile tileLocation;
-    void Awake()
+    void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
     }

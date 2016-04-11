@@ -39,13 +39,14 @@ public class DungeonMarker : MonoBehaviour {
         completed = c;
     }
 
-    void Awake()
+    void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        player = PlayerController.player;
     }
 
     void OnMouseDown()
     {
+        if (player == null) player = PlayerController.player;
         if (Vector3.Distance(transform.position, player.transform.position) <= activationDist)
         {
             //track dungeon marker by its coordinates
