@@ -102,7 +102,7 @@ public class StartMenu : MonoBehaviour
 
 	public void ThreeCitiesPress()
 	{
-        WorldManager.SetNumVillages(3);
+        WorldManager.SetNumVillages(1);
 		SceneManager.LoadScene(GameManager.GetWorldScenePath());
 	}
 

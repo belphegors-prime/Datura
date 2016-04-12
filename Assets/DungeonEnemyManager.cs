@@ -13,8 +13,8 @@ public class DungeonEnemyManager : MonoBehaviour {
 	void Start()
     {
         rooms = GameObject.Find("Dungeon").GetComponentsInChildren<Room>();
-        if (enemyFreq > rooms.Length || enemyFreq <= 1) enemyFreq = 5;
-        SetEnemies();
+        //if (enemyFreq > rooms.Length || enemyFreq <= 1) enemyFreq = 5;
+        //SetEnemies();
     }
 
     void SetEnemies()

@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
 	private bool deathAnimationCompleted = false;
 	public bool attackAnimationCompleted = false;
-
+    int previousAnimationNumber = 0;
    // public Animator anim1H, anim2H;
 	
 	// Player state
@@ -201,7 +201,7 @@ public class PlayerController : MonoBehaviour
 	{
         while (activeState == PLAYER_STATE.MOVE)
         {
-            Debug.Log(navAgent.enabled);
+            //Debug.Log(navAgent.enabled);
             navAgent.SetDestination(raycastHit.point); // Move player to destination
             animator.SetInteger("CharacterState", (int)ANIMATION_STATE.MOVE);
 
@@ -221,40 +221,38 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	IEnumerator PlayerAttack()
-	{
-		lastTarget = target;
-		GameObject targetGameObject = target.gameObject;
+    IEnumerator PlayerAttack()
+    {
+        lastTarget = target;
+        GameObject targetGameObject = target.gameObject;
+        animator.SetInteger("AnimationNumber", generateRandomAnimationNumber());
 
-		while(activeState == PLAYER_STATE.ATTACK)
-		{	
-			// If player is not within attack range, move player towards enemy
-			if(Vector3.Distance(transform.position, lastTarget.transform.position) > attackRange + 1)
-			{
-				navAgent.SetDestination(targetGameObject.transform.position);
-				animator.SetInteger("CharacterState", (int) ANIMATION_STATE.MOVE);
-			}
+        while (activeState == PLAYER_STATE.ATTACK)
+        {
+            if (Vector3.Distance(transform.position, lastTarget.transform.position) > attackRange + 1)
+            {
+                navAgent.SetDestination(targetGameObject.transform.position);
+                animator.SetInteger("CharacterState", (int)ANIMATION_STATE.MOVE);
+            }
 
-			else if(animator.GetInteger("CharacterState") == (int) ANIMATION_STATE.ATTACK && attackAnimationCompleted)
-			{
-				attackAnimationCompleted = false;
-				ChangeState(PLAYER_STATE.IDLE);
-                CauseDamage();
-			}
+            // If player is within attack range, attack enemy
+            else if (Vector3.Distance(transform.position, lastTarget.transform.position) <= attackRange)
+            {
+                transform.LookAt(targetGameObject.transform); // Face enemy when attacking
+                navAgent.ResetPath(); // Stop moving player
+                animator.SetInteger("CharacterState", (int)ANIMATION_STATE.ATTACK);
+            }
 
-
-			// If player is within attack range, attack enemy
-			else if(Vector3.Distance(transform.position, lastTarget.transform.position) <= attackRange)
-			{
-                //Debug.Log("Attack anims start");
-				transform.LookAt(targetGameObject.transform); // Face enemy when attacking
-				navAgent.ResetPath(); // Stop moving player
-				animator.SetInteger("CharacterState", (int) ANIMATION_STATE.ATTACK);
-                setAttackAnimationCompleted();
-			}
-
-			yield return null;
-		}
-	}
-
+            yield return null;
+        }
+    }
+    private int generateRandomAnimationNumber()
+    {
+        int animationNumber = Random.Range(0, 4);
+        if (animationNumber == previousAnimationNumber) animationNumber++;
+        if (animationNumber == 4) animationNumber = 0;
+        previousAnimationNumber = animationNumber;
+        return animationNumber;
+    }
 }
+

@@ -25,7 +25,7 @@ public class WorldManager : MonoBehaviour {
     GameObject landParent, waterParent, vmParent, dmParent;
     PlayerController player;
     static WorldData saveData;
-
+    int numDungeons;
 
     //assign variables, create grid references, create persistent data
     public int GetNumVillages()
@@ -41,7 +41,7 @@ public class WorldManager : MonoBehaviour {
 
     public int GetNumDungeons()
     {
-        return numVills * dungeonPerVill;
+        return dmParent.transform.childCount;
     }
 
     public static void SetDungeonPerVill(int n)
@@ -71,7 +71,7 @@ public class WorldManager : MonoBehaviour {
             }
         }
 
-        saveData = new WorldData();
+        
         vmParent = new GameObject("Village Markers");
         dmParent = new GameObject("Dungeon Markers");
     }
@@ -357,18 +357,22 @@ public class WorldManager : MonoBehaviour {
 
         //instantiate and spawn onto random land tile
         player = Instantiate(playerPrefab).GetComponent<PlayerController>();
-        player.transform.position = landParent.transform.GetChild((int)UnityEngine.Random.Range(0, landParent.transform.childCount - 1)).position;
-        //temporary bug fix, adjust female player's Y position so she is on top of the ground
-        if (PlayerController.GetGender().Equals(PlayerController.Gender.FEMALE))
+        //some coast tiles will trap the player, make sure to spawn on forest or snow tile
+        Tile t;
+        while (true)
         {
-            //player.transform.Translate(new Vector3(0f, -player.transform.position.y, 0f));
+            t = landParent.transform.GetChild((int)UnityEngine.Random.Range(0, landParent.transform.childCount - 1)).GetComponent<Tile>();
+            if (!(t.biome.Equals(Tile.BIOME.COAST))) break;
         }
+        player.transform.position = t.transform.position;
+     
 
     }
     void CreatePersistentData()
     {
         //store tile info
-        for(int i = 0; i < gridSize; i++)
+        saveData = new WorldData();
+        for (int i = 0; i < gridSize; i++)
         {
             for(int j = 0; j < gridSize; j++)
             {
@@ -440,18 +444,30 @@ public class WorldManager : MonoBehaviour {
             {
                 
                 int[] tileCoords = saveData.dmTiles[i];
-                //if tileCoords match last dungeon coords and IsCurrentDungeon is set to true, then do not instantiate marker
-                if (tileCoords[0] == lastDungeonCoords[0]
-                    && tileCoords[1] == lastDungeonCoords[1]
-                    && GameManager.IsCurrentDungeonCompleted())
-                {
-                    GameManager.SetCurrentDungeonCompleted(false); //reset for next entered dungeon
-                    continue;
-                }
                 DungeonMarker dm = (DungeonMarker)Instantiate(dmPrefab);
+                /*Debug.Log(i + "Last Dungeon Coordinates: " + lastDungeonCoords[0] + "," + lastDungeonCoords[1]);
+                Debug.Log(i+ "TileCoords: " + tileCoords[0] + "," + tileCoords[1]);
+                Debug.Log(i +"tileCoords == lastDungeonCoords: " + tileCoords.Equals(lastDungeonCoords));
+                Debug.Log(i +"Individually: "+ (tileCoords[0] == lastDungeonCoords[0] && tileCoords[1] == lastDungeonCoords[1]));
+                Debug.Log(i + "dungeon complete? " + GameManager.IsCurrentDungeonCompleted());               */
+                //if tileCoords match last dungeon coords and IsCurrentDungeon is set to true, then do not instantiate marker
+                if (lastDungeonCoords != null)
+                {
+                    if (tileCoords[0] == lastDungeonCoords[0]
+                        && tileCoords[1] == lastDungeonCoords[1]
+                        && GameManager.IsCurrentDungeonCompleted())
+                    {
+                        Debug.Log("last dungeon has been completed");
+                        GameManager.SetCurrentDungeonCompleted(false); //reset for next entered dungeon
+                        Destroy(dm.gameObject);
+                        continue;
+                    }
+                }
+                
                 dm.SetTile(grid[tileCoords[0], tileCoords[1]]);
                 dm.transform.position = grid[tileCoords[0], tileCoords[1]].transform.position;
                 dm.transform.SetParent(dmParent.transform);
+                Debug.Log("Dungeon Markers:" + dmParent.transform.childCount);
             }
             PlayerController.player.GetComponent<NavMeshAgent>().enabled = false;
             PlayerController.player.transform.position = new Vector3(saveData.lastPlayerLocation[0], saveData.lastPlayerLocation[1], saveData.lastPlayerLocation[2]);

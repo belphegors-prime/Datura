@@ -20,7 +20,7 @@ public class RandomEncounter : MonoBehaviour {
             switch (b)
             {
                 case Tile.BIOME.COAST:
-                    SceneManager.LoadScene("EncounterScenes/CoastEncounter");
+                    SceneManager.LoadScene("Scenes/EncounterScenes/CoastEncounter");
                     break;
 
                 case Tile.BIOME.SNOW:

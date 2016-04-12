@@ -96,7 +96,7 @@ public class SimpleDungeonMaster : MonoBehaviour
         
         for (int i = 0; i < roomsToExpand.Count; i++)
         {
-            Debug.Log(r[i].name);
+            //Debug.Log(r[i].name);
             foreach (Transform door in r[i].transform.Find("Doors"))
             {
                 Vector3 dir = (Vector3) dirToVector[door.name[0]];
