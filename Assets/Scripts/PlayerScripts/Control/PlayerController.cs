@@ -140,7 +140,7 @@ public class PlayerController : MonoBehaviour
 			    Physics.Raycast (ray, out raycastHit, 100);
 
 			    if (!target) ChangeState (PLAYER_STATE.MOVE); // If no target is specified, move
-			    else ChangeState (PLAYER_STATE.ATTACK); // If target is enemy specified, attack
+			    else if(animator.GetInteger("CharacterState") != (int) ANIMATION_STATE.ATTACK) ChangeState (PLAYER_STATE.ATTACK); // If target is enemy specified, attack
 		    } 
 
 		
