@@ -3,7 +3,7 @@ using System.Collections;
 
 
 public class DungeonMaster : MonoBehaviour {
-    public Room roomPrefab, hallwayPrefab;
+   /* public Room roomPrefab, hallwayPrefab;
     public Transform floorRef;
     public GameObject doorPrefab, hallToRoom, openHall;
     public float pHallway;
@@ -22,7 +22,7 @@ public class DungeonMaster : MonoBehaviour {
         Vector3 dist = (s.transform.position - t.transform.position);
         Vector3 sPos = s.transform.position; Vector3 tPos = t.transform.position;
         /* ===================2 ROOMS CASE================*/
-        if (s.name.Substring(0, 4).Equals("Room") && t.name.Substring(0, 4).Equals("Room"))
+   /*     if (s.name.Substring(0, 4).Equals("Room") && t.name.Substring(0, 4).Equals("Room"))
         {
             Transform sWalls = s.transform.FindChild("Walls");
             Transform sDoors = s.transform.FindChild("Doors");
@@ -80,7 +80,7 @@ public class DungeonMaster : MonoBehaviour {
         }
 
         /*========HALLWAY TO ROOM CASE===========*/
-        if (s.name.Equals("Hallway") ^ t.name.Equals("Hallway")){
+      /*  if (s.name.Equals("Hallway") ^ t.name.Equals("Hallway")){
             Room hall, room;
             if (s.name.Equals("Hallway"))
             {
@@ -162,7 +162,7 @@ public class DungeonMaster : MonoBehaviour {
         /*========HALL TO HALL CONNECT========*/ 
             
     }
-    void ConstructHallway(Room creator, char cardinal)
+   /* void ConstructHallway(Room creator, char cardinal)
     {
         int currentDepth = creator.depth;
         Room neighbor = Instantiate(hallwayPrefab) as Room;
@@ -265,7 +265,7 @@ public class DungeonMaster : MonoBehaviour {
         Fix bug: doors are skipped over leaving gaps
     */
     //builds and connects rooms and hallways
-    void Expand(Room r)
+  /*  void Expand(Room r)
     {
         if (numRooms > roomLimit)
         {
@@ -288,7 +288,7 @@ public class DungeonMaster : MonoBehaviour {
                 continue;
             }*/
             //make sure door doesn't lead into already constructed area
-            Vector3 v;
+          /*  Vector3 v;
             switch (door.name[0])
             {
                 case 'z':
@@ -441,5 +441,5 @@ public class DungeonMaster : MonoBehaviour {
         SetReferences();
         BuildDungeon();
 	}
-    
-}
+    */
+

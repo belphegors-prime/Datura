@@ -364,8 +364,9 @@ public class WorldManager : MonoBehaviour {
             t = landParent.transform.GetChild((int)UnityEngine.Random.Range(0, landParent.transform.childCount - 1)).GetComponent<Tile>();
             if (!(t.biome.Equals(Tile.BIOME.COAST))) break;
         }
+        player.GetComponent<NavMeshAgent>().enabled = false;
         player.transform.position = t.transform.position;
-     
+        player.GetComponent<NavMeshAgent>().enabled = true;
 
     }
     void CreatePersistentData()

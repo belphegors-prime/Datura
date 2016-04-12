@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public enum Gender { MALE, FEMALE}
     static Gender gender;
 
-    GameObject rightHandWeap, leftHandWeap, leftHandShieldMount;
+    //GameObject rightHandWeap, leftHandWeap, leftHandShieldMount;
     
     public GameObject Sword2H, Sword1H, Shield;
 	Animator animator;
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
 	public void TakeDamage(float damage)
 	{
 		currentHealth -= damage;
-		if(currentHealth <= 0) ChangeState(PLAYER_STATE.DEAD);
+		//if(currentHealth <= 0) ChangeState(PLAYER_STATE.DEAD);
 	}
 
     public void DisableInventoryResumeGame()
@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour
         if (!inventoryPrefab.enabled) Debug.Log("???? fml");
     }
     
-    public void SwitchTo2H()
+   /* public void SwitchTo2H()
     {
         GameObject currentWeap = rightHandWeap.transform.GetChild(0).gameObject;
         currentWeap.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviour
 
         animator.runtimeAnimatorController = Resources.Load("2H_WeaponControl") as UnityEngine.RuntimeAnimatorController;
         
-    }
+    }*/
     
 	// If user presses button, handle interaction
 	private void HandleButtonClick()
@@ -147,7 +147,7 @@ public class PlayerController : MonoBehaviour
             else if(Input.GetButtonUp("Inventory"))
             {
                 Debug.Log("inventory button up");
-                PauseGame();
+                //PauseGame();
                 inventoryPrefab.gameObject.SetActive(true);
                 //inventInst = Instantiate(inventoryPrefab) as Canvas;
                 //inventInst.enabled = true;
@@ -158,10 +158,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void PauseGame()
-    {
-        Time.timeScale = 0;
-    }
 
 	public void ChangeState(PLAYER_STATE state)
 	{
@@ -185,7 +181,7 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator PlayerDead()
 	{
-		animator.SetInteger("CharacterState", (int) ANIMATION_STATE.DEAD);
+		/*animator.SetInteger("CharacterState", (int) ANIMATION_STATE.DEAD);
         Vector3 deathPos = player.transform.position;
         deathPos.y = -1.4f;
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("die"))
@@ -193,7 +189,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("inside if" + deathPos.y);
             setDeathAnimationCompleted();
             player.transform.position.Set(deathPos.x, deathPos.y, deathPos.z);//set player onto ground
-        }
+        }*/
 		yield return null;
 	}
 

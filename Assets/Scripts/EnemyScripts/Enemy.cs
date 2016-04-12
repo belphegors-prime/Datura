@@ -14,7 +14,7 @@ public abstract class Enemy : Character
 	protected bool willFlee;
 	protected bool bleedWhenDamaged;
 	public bool startSinking = false;
-	public float timer = 0.0f; // Begin timer at this value
+	//public float timer = 0.0f; // Begin timer at this value
 
 	public GameObject bloodPrefab;
 	private GameObject bloodPrefabInstance;
@@ -27,7 +27,7 @@ public abstract class Enemy : Character
 	public ENEMY_STATE activeState = ENEMY_STATE.PATROL;
 
 	public float sinkSpeed = 2.5f; // Speed at which enemy sinks when dying
-    public bool dead = false;
+    public float timer = 0f;
 
 	protected abstract void Initialize();
 
@@ -307,28 +307,27 @@ public abstract class Enemy : Character
 	// Initiate enemy dead state
 	IEnumerator EnemyDead()
 	{
-        if (!dead)
-        {
-            dead = true;
-            animator.SetInteger("CharacterState", (int)ANIMATION_STATE.DEAD); // Play dead animation 
-        }
-
+      
+        animator.SetInteger("CharacterState", (int)ANIMATION_STATE.DEAD); // Play dead animation 
+        
         //transform.parent = null; //set parent (Squadron reference) to null, 
 
 		Destroy(navAgent); // Make game object immovable
 		Destroy(GetComponent<Collider>()); // Make game object non selectable
 		if(player.target == this) player.target = null; // Unset this game object as target
 
-		float sinkingTime = 5.0f;
+		float sinkingTime = 2.0f;
+         
         //float timerMax = 10.0f; // Destroy game oxbject once timer hits this value
 		// Delete game object once timer hits maximums
-		while(timer < 6.0f)
+		while(timer < 2.5f)
 		{
 			timer += Time.deltaTime;
-			if(timer >= sinkingTime) startSinking = true;
+            if (timer >= sinkingTime) startSinking = true;
+            else Debug.Log(this.name + " " + timer);
 			yield return null;
 		}
-
+        Debug.Log(this.name + " dead");
 		Destroy(gameObject);
 		yield return null;
 	}

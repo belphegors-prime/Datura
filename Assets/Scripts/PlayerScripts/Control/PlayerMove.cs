@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerMove : MonoBehaviour 
 {
-	public static PlayerMove player; // Reference to player
+	/*public static PlayerMove player; // Reference to player
 	public Enemy target; // Reference to enemy target
 	public Enemy lastTarget; // Reference to last selected enemy
 	
@@ -84,18 +84,18 @@ public class PlayerMove : MonoBehaviour
 	// If user presses left mouse button, handle interaction
 	private void HandleMouseClick()
 	{
-		// If user presses left mouse button, move player to where raycast hits terrain
-		if(activeState != PLAYER_STATE.DEAD && Input.GetMouseButtonUp (0)) 
-		{
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			Physics.Raycast (ray, out raycastHit, 100);
+        // If user presses left mouse button, move player to where raycast hits terrain
+        if (activeState != PLAYER_STATE.DEAD && Input.GetMouseButtonUp(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out raycastHit, 100);
 
-			if (!target) ChangeState (PLAYER_STATE.MOVE); // If no target is specified, move
-			else ChangeState (PLAYER_STATE.ATTACK); // If target is enemy specified, attack
-		} 
+            if (!target) ChangeState(PLAYER_STATE.MOVE); // If no target is specified, move
+            else ChangeState(PLAYER_STATE.ATTACK); // If target is enemy specified, attack
+        }
 
-		else if(deathAnimationCompleted && Input.GetMouseButtonUp (0)) 
-			Application.LoadLevel (Application.loadedLevelName);
+        else if (deathAnimationCompleted && Input.GetMouseButtonUp(0)) { }
+			//Application.LoadLevel (Application.loadedLevelName);
 	}
 
 	public void ChangeState(PLAYER_STATE state)
@@ -126,7 +126,7 @@ public class PlayerMove : MonoBehaviour
 
 	IEnumerator Move()
 	{
-		bool runStarted = false;
+		//bool runStarted = false;
         //float velocityThreshold = 0.5f; // Velocity threshold determining when player is running
 
         while (activeState == PLAYER_STATE.MOVE)
@@ -183,5 +183,5 @@ public class PlayerMove : MonoBehaviour
 
 			yield return null;
 		}
-	}
+	}*/
 }

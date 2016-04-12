@@ -12,8 +12,4 @@ public class PlayerEntry : MonoBehaviour {
         player.gameObject.GetComponent<NavMeshAgent>().enabled = true;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

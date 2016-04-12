@@ -9,7 +9,7 @@ public class TorchTrigger : MonoBehaviour {
         //if player passes through collider, activate torch lights
         if (c.tag.Equals("Player"))
         {
-            Debug.Log("Player has passed through collider");
+            //Debug.Log("Player has passed through collider");
             Transform door = transform.parent;
             Transform torchA = door.FindChild("TorchA");
             Transform torchB = door.FindChild("TorchB");

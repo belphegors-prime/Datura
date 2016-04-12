@@ -7,14 +7,14 @@ public class DungeonEnemyManager : MonoBehaviour {
     public GameObject squadPrefab;
     public GameObject canvas;
     public Font definitelyNotDiablosFont;
-    public int enemyFreq; //
+    public static int enemyFreq; //
     Room[] rooms;
 	// Use this for initialization
 	void Start()
     {
         rooms = GameObject.Find("Dungeon").GetComponentsInChildren<Room>();
-        //if (enemyFreq > rooms.Length || enemyFreq <= 1) enemyFreq = 5;
-        //SetEnemies();
+        if (enemyFreq > rooms.Length || enemyFreq <= 1) enemyFreq = 5;
+        SetEnemies();
     }
 
     void SetEnemies()
@@ -32,7 +32,7 @@ public class DungeonEnemyManager : MonoBehaviour {
 	    if(transform.childCount == 0)
         {
             Text t = canvas.AddComponent<Text>();
-            t.text = "YOU DEFEATED";
+            t.text = "DUNGEON CLEARED";
             t.font = definitelyNotDiablosFont;
             t.fontSize = 32;
             t.alignment = TextAnchor.MiddleCenter;

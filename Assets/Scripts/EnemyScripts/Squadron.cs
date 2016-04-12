@@ -26,6 +26,7 @@ public abstract class Squadron : MonoBehaviour {
     {
         //randomly spawn enemies located in path
         Enemy[] units = Resources.LoadAll<Enemy>(path);
+        Debug.Log(units.Length);
         for (int i = 0; i < enemyCount; i++)
         {
             Vector3 spawnPos = spawnArea.center;
@@ -40,14 +41,6 @@ public abstract class Squadron : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        //iterate over enemies, unparent if dead
-        /*foreach(Transform unit in transform)
-        {
-            if (unit.GetComponent<Enemy>().dead)
-            {
-                unit.parent = null; 
-            }
-        }*/
         CheckIfDead();
     }
     protected virtual void CheckIfDead()
@@ -56,7 +49,7 @@ public abstract class Squadron : MonoBehaviour {
         {
             Debug.Log("enemies cleared");
             Text t = canvas.AddComponent<Text>();
-            t.text = "YOU DEFEATED";
+            t.text = "YOU DEFEATED\n你是終極力量";
             t.font = definitelyNotDiablosFont;
             t.fontSize = 32;
             t.alignment = TextAnchor.MiddleCenter;

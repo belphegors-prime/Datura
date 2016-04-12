@@ -26,7 +26,7 @@ public class SimpleDungeonMaster : MonoBehaviour
     void Connect(Room s, Room t)
     {
         //Debug.Log("connecting" + s.name + " " + t.name);
-        Vector3 dist = (s.transform.position - t.transform.position);
+        //Vector3 dist = (s.transform.position - t.transform.position);
         Vector3 sPos = s.transform.position; Vector3 tPos = t.transform.position;
         /* ===================2 ROOMS CASE================*/
         if (s.name.Substring(0, 4).Equals("Room") && t.name.Substring(0, 4).Equals("Room"))
@@ -184,7 +184,7 @@ public class SimpleDungeonMaster : MonoBehaviour
                 return;
             }
             Room r = roomsToExpand.Peek() as Room;
-            int currentDepth = r.depth + 1;
+            //int currentDepth = r.depth + 1;
 
 
             //foreach newly generated door decide whether to build hallway or additional room
